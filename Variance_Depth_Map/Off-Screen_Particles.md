@@ -109,7 +109,12 @@ Depth testing is implemented with a comparison in the pixel shader. The downsamp
 #### Example 23-1. The Depth Test Implemented in the Pixel Shader
 
 ```
-    float4 particlePS(VS_OUT vIn): COLOR {   float myDepth = vIn.depth;   float sceneDepth = tex2D(depthSampler, vIn.screenUV).x;   if (myDepth > sceneDepth)     discard;   // Compute color, etc.   . . . } 
+    float4 particlePS(VS_OUT vIn): COLOR {   
+    	float myDepth = vIn.depth;  
+    	float sceneDepth = tex2D(depthSampler, vIn.screenUV).x;   
+    	if (myDepth > sceneDepth)    
+    	discard;   // Compute color, etc.   . . . 
+    } 
 ```
 
 Given that we have access to the particle and scene depth in the pixel shader, it is trivial to additionally implement *soft particles*. The soft particles effect fades the particle alpha where it approaches an intersection with solid scene objects. Harsh, sharp intersections are thus avoided. The visual benefits are significant. Listing 23-2 shows the required pixel shader code. Note that the `zFade` value replaces the comparison and discard; `zFade` is zero where the particle is entirely occluded.
@@ -117,7 +122,12 @@ Given that we have access to the particle and scene depth in the pixel shader, i
 #### Example 23-2. Soft Particles Are Better Than a Binary Depth Test
 
 ```
-    float4 particlePS(VS_OUT vIn): COLOR {   float myDepth = vIn.depth;   float sceneDepth = tex2D(depthSampler, vIn.screenUV).x;   float zFade = saturate(scale * (myDepth - sceneDepth));   // Compute (r,g,b,a), etc.   . . .   return float4(r,g,b, a * zFade); } 
+    float4 particlePS(VS_OUT vIn): COLOR {   
+    	float myDepth = vIn.depth;   
+    	float sceneDepth = tex2D(depthSampler, vIn.screenUV).x;   
+    	float zFade = saturate(scale * (myDepth - sceneDepth));   // Compute (r,g,b,a), etc.   . . .   
+    	return float4(r,g,b, a * zFade);
+    } 
 ```
 
 We will not discuss soft particles further here. They are only a nice side effect, not the main focus. The technique is thoroughly explored in NVIDIA's DirectX 10 SDK (Lorach 2007).
