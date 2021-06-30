@@ -113,7 +113,8 @@ Depth testing is implemented with a comparison in the pixel shader. The downsamp
     	float myDepth = vIn.depth;  
     	float sceneDepth = tex2D(depthSampler, vIn.screenUV).x;   
     	if (myDepth > sceneDepth)    
-    	discard;   // Compute color, etc.   . . . 
+    	discard;   
+    	// Compute color, etc.   . . . 
     } 
 ```
 
@@ -125,7 +126,8 @@ Given that we have access to the particle and scene depth in the pixel shader, i
     float4 particlePS(VS_OUT vIn): COLOR {   
     	float myDepth = vIn.depth;   
     	float sceneDepth = tex2D(depthSampler, vIn.screenUV).x;   
-    	float zFade = saturate(scale * (myDepth - sceneDepth));   // Compute (r,g,b,a), etc.   . . .   
+    	float zFade = saturate(scale * (myDepth - sceneDepth));   
+    	// Compute (r,g,b,a), etc.   . . .   
     	return float4(r,g,b, a * zFade);
     } 
 ```
@@ -169,7 +171,7 @@ So we accumulate the **s** terms in the RGB channels with conventional alpha ble
 
 It is also common to additively blend particles into the frame buffer for emissive effects such as fire. Handling this case is much simpler than the preceding alpha-blended case. Values are additively accumulated in the off-screen target and then added to the frame buffer.
 
-Using both blended and additive particles is common in games. We have not tried this, but we believe that it would not be possible to combine both in a single off-screen buffer. Supporting both might require a separate off-screen pass for each.
+Using both blended and additive particles is common in games. We have not tried this, but we believe that it would not be possible to combine both in a single off-screen buffer. Supporting both might require a separate off-screen pass for each. （实际上是可以的）
 
 ## 23.6 Mixed-Resolution Rendering
 
@@ -210,7 +212,19 @@ The particles are then rendered a second time. The stencil states are set such t
 #### Example 23-4. The `discard` Keyword Used to Avoid Stencil Writes, Creating a Mask
 
 ```
-    float4 composePS(VS_OUT2 vIn): COLOR {   float4 edge = tex2D(edgesSampler, vIn.UV0.xy);   if (edge.r == 0.0)   {     float4 col = tex2D(particlesRTSampler, vIn.UV1.xy);     return rgba;   }   else   {     // Where we have an edge, abort to cause no stencil write.    discard;   } } 
+    float4 composePS(VS_OUT2 vIn): COLOR {   
+    	float4 edge = tex2D(edgesSampler, vIn.UV0.xy);   
+    	if (edge.r == 0.0)   
+    	{     
+    		float4 col = tex2D(particlesRTSampler, vIn.UV1.xy);    
+    		return rgba;   
+    	}   
+    	else   
+    	{     
+    	// Where we have an edge, abort to cause no stencil write.    
+    		discard;   
+    	} 
+    } 
 ```
 
 ## 23.7 Results
